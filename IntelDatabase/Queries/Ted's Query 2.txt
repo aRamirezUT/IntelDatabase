@@ -1,0 +1,18 @@
+-- Deletes all i3 CPU's when the 3 entry is deleted from Series
+-- A delete statement that runs a trigger in which the trigger deletes data in one table.
+-- Ted Lee
+
+DROP TRIGGER IF EXISTS KILL_I3; -- Remove the trigger if it exists already to avoid errors.
+
+DELIMITER |
+CREATE TRIGGER KILL_I3
+BEFORE DELETE ON SERIES
+FOR EACH ROW
+BEGIN
+	DELETE FROM CPU WHERE CPU.SERIES_ID = 3; -- Loop through and delete all i3 CPU's from the database.
+END;
+| 
+DELIMITER ;
+
+-- Activates the trigger
+DELETE FROM SERIES WHERE SERIES_ID = 3;

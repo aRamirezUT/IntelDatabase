@@ -1,0 +1,24 @@
+Victor's Query 1
+--trigger activates when cpu information changes and if the base clock speed is higher than the boost, it will set both speeds to 0 to represent failure.
+--insert query will only work once, must increment first value of 113 to run again
+
+--trigger:
+
+delimiter |
+CREATE TRIGGER CLOCK_FIX
+BEFORE INSERT ON CPU --before inserting any new data of new cpus
+FOR EACH ROW
+BEGIN
+    IF NEW.cpu_base_clock > NEW.cpu_boost_clock THEN --if base speed is faster than boost
+        SET NEW.cpu_boost_clock = 0.0;
+            SET NEW.cpu_base_clock = 0.0; --trigger sets base and boost to 0
+    END IF;
+END;
+|
+delimiter ;
+
+--Insert Query:
+
+INSERT INTO CPU cpu_id, cpu_name, gen_id, series_id, socket_id, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id
+VALUES 
+('113', '14000', '13', '9', '1700', '2024', '6', '5', '24', '32', '36', '125', '0');

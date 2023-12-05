@@ -1,0 +1,14 @@
+/* Display all distinct CPU's from a generation that match the cache size and base clock speed
+   
+A select statement that uses at least one join, concatenation, and distinct clause
+   
+Charles Swick */
+ 
+select distinct concat(ucase(left(gen_codename,1)),substring(gen_codename,2)) as "Generation", 
+concat("LGA-",cpu.socket_id) as "Socket",
+concat("Core i",cpu.series_id) as "CPU Series",cpu.cpu_name as "Processor ID",
+concat(cpu.cpu_cache," MB") as "Cache", concat(cpu.cpu_base_clock," GHz") as "Base Clock",
+cpu.cpu_core_count as "Total Cores", cpu.cpu_thread_count as "Total Threads"
+from generation
+inner join CPU on generation.gen_id = cpu.gen_id
+where generation.gen_id = 13 and cpu.cpu_cache > 20 and cpu.cpu_base_clock > 2.0;

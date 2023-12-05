@@ -1,0 +1,36 @@
+-- Cristian Lopez 
+-- This query can be used to determine the fastest processor available for each series
+-- Displays the highest end processor for each generation based on cache size, and Core Count
+-- Relevance : Example for the ASUS Prime Z390 motherboard (Intel 8th Gen) the fastest compatible processors are the 8350k, 8400, 8700
+
+SELECT 
+    Generation,
+    Socket_Type,
+    CPU,
+    Min_Cache_Size,
+    Min_Core_Count
+FROM (
+    SELECT 
+        gen.gen_codename AS Generation,
+        s.socket_id AS Socket_Type,
+        CONCAT('i', se.series_id, '-', c.cpu_name) AS CPU,
+        MIN(c.cpu_cache) AS Min_Cache_Size,
+        MIN(c.cpu_core_count) AS Min_Core_Count,
+    ROW_NUMBER() OVER (
+        PARTITION BY gen.gen_codename, se.series_id -- Partition by generation and series
+        ORDER BY se.series_id -- Ordering by series_id directly
+        ) AS rn -- Assign row number
+    FROM 
+        cpu c
+    INNER JOIN series se ON c.series_id = se.series_id -- Join Series table
+    INNER JOIN socket s ON c.socket_id = s.socket_id -- Join Socket table
+    LEFT JOIN igpu i ON c.igpu_id = i.igpu_id -- Left join iGPU
+    LEFT JOIN generation gen ON c.gen_id = gen.gen_id -- Left join generation
+    GROUP BY 
+        gen.gen_codename, s.socket_id, CONCAT('i', se.series_id, '-', c.cpu_name)
+) AS ranked
+WHERE rn = 1 -- Filtering the top CPU for each generation and series
+ORDER BY 
+    Generation DESC,
+    Min_Cache_Size ASC,
+    Min_Core_Count ASC;

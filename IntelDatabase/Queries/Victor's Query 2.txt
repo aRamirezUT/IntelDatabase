@@ -1,0 +1,18 @@
+Victor's Query 2
+
+--Query that Shows Processors with integrated graphics to avoid
+--Query returns processors with igpu, generation older than 9, and series below 7. Processors are older and more likely to not meet system requirements for newer software
+--ordered by cpu base clock speed, igpu speed, and series version
+
+SELECT  
+    gen_codename AS Name, 
+    cpu_name AS CPU, 
+    cpu.series_id AS CORE, 
+    cpu_base_clock AS 'Clock Speed', 
+    igpu_name AS iGPU, 
+    igpu_boost_clock AS 'iGPU Speed'
+FROM CPU
+INNER JOIN igpu ON igpu.igpu_id = cpu.igpu_id
+INNER JOIN generation ON generation.gen_id = cpu.gen_id
+WHERE cpu.igpu_id > 0 AND cpu.gen_id < 9 AND cpu.series_id < 7
+ORDER BY cpu_base_clock, igpu_boost_clock, cpu.series_id;

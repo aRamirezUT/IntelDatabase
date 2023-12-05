@@ -1,0 +1,10 @@
+-- Ted's Query 1 - (Order By Query)
+-- This query can be used to determine the slowest base clock based off of the minimum base clock and displays the CPU's generation, series, and name
+
+SELECT cpu.gen_id AS " CPU Generation",
+cpu.series_id AS "CPU Series",
+cpu.cpu_name AS "CPU Name",
+cpu.cpu_base_clock AS "Base Clock",
+cpu.cpu_boost_clock AS "Boost Clock"
+FROM CPU
+ORDER BY cpu.cpu_base_clock ASC;

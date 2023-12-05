@@ -1,0 +1,33 @@
+-- Deletes all i3 CPU's when the 3 entry is deleted from Series
+-- A delete statement that runs a trigger in which the trigger deletes data in one table.
+-- Ted Lee
+
+DROP TRIGGER IF EXISTS KILL_I3; -- Remove the trigger if it exists already to avoid errors.
+
+DELIMITER |
+CREATE TRIGGER KILL_I3
+BEFORE DELETE ON SERIES
+FOR EACH ROW
+BEGIN
+    DELETE FROM CPU WHERE CPU.SERIES_ID = 3; -- Loop through and delete all i3 CPU's from the database.
+END;
+| 
+DELIMITER ;
+
+-- Activates the trigger
+DELETE FROM SERIES WHERE SERIES_ID = 3;
+/* Show the average core count, 
+and base clock speed, as well as the high/low base clock across all cpu's in a given generation, 
+and the total number of CPU's in that generation 
+
+A select statement that includes at least two aggregate functions
+
+Charles Swick */
+
+SELECT cpu.gen_id as "Generation", AVG(CPU.CPU_CORE_COUNT) AS "Average Core Count", 
+concat(AVG(CPU.CPU_BASE_CLOCK)," GHz") as "Average base clock", 
+concat(Min(cpu.cpu_base_clock)," GHz") as "Lowest Base Clock", 
+concat(Max(cpu.cpu_base_clock)," GHz") as "Highest Base Clock",
+COUNT(distinct CPU.CPU_ID) as "Total CPU's"
+from CPU
+where cpu.gen_id = 6;

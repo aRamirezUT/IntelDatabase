@@ -1,0 +1,41 @@
+-- Aren's Query 1 - (A select statement that includes at least one subquery)
+-- This query determines which socketType has the best 'performance'
+-- It sorts by the highest CoreCount, ThreadCount, and MaxBoostClock based on the SocketType and then displays the top 6 of each SocketType
+SELECT 
+    SocketType,
+    Generation,
+    CPU,
+    CoreCount,
+    ThreadCount,
+    BaseClock,
+    MaxBoostClock
+FROM (
+    SELECT 
+        CONCAT('LGA-', c.socket_id) AS SocketType,
+        g.gen_codename AS Generation,
+        CONCAT('i', s.series_id, '-', c.cpu_name) AS CPU,
+        c.cpu_core_count AS CoreCount,
+        c.cpu_thread_count AS ThreadCount,
+        CONCAT(cpu_min_max.min_base_clock, ' GHz') AS BaseClock, -- Format and select the min base clock
+        CONCAT(cpu_min_max.max_boost_clock, ' GHz') AS MaxBoostClock, -- Format and select the max base clock
+        ROW_NUMBER() OVER (
+            PARTITION BY CONCAT('LGA-', c.socket_id) -- Partitioning by SocketType to rank within each type
+            ORDER BY c.cpu_core_count DESC, c.cpu_thread_count DESC, cpu_min_max.max_boost_clock DESC -- Ordering by CoreCount, ThreadCount, MaxBoostClock
+        ) AS rn -- Assign row numbers within each partition
+    FROM 
+        cpu c
+    INNER JOIN series s ON c.series_id = s.series_id -- Join the CPU table with Series table based on series_id
+    JOIN (
+        SELECT 
+            gen_id,
+            MAX(cpu_boost_clock) AS max_boost_clock,
+            MIN(cpu_base_clock) AS min_base_clock
+        FROM 
+            cpu
+        GROUP BY 
+            gen_id
+    ) AS cpu_min_max ON c.gen_id = cpu_min_max.gen_id -- Joining to get min and max clock speeds by generation
+    LEFT JOIN generation g ON c.gen_id = g.gen_id -- Joining to get generation code names
+) AS ranked
+WHERE rn <= 6 -- Select only the top 6 CPUs within each SocketType
+ORDER BY SocketType, rn; -- Ordering the results by SocketType and row number

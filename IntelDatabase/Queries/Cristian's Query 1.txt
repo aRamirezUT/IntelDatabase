@@ -1,0 +1,10 @@
+-- Cristian Lopez
+-- Show all hexacore or higher CPU's with a TDP lower than the average, from 8th gen or newer
+-- Sort by highest base clock rate
+-- Relevance : Finding the most efficient processor to save money on electricity and to ensure adequate cooling in a given system.
+Select distinct concat(concat("i",cpu.series_id),
+concat("    ",cpu_name)) as "Processor",cpu_tdp as TDP, cpu_base_clock as "Base Clock"
+from CPU
+inner join Generation on cpu.gen_id = generation.gen_id
+where cpu_tdp <= (select AVG(cpu_tdp) from cpu) and generation.gen_id >= 8 and cpu.cpu_core_count >= 6
+order by cpu_base_clock desc;

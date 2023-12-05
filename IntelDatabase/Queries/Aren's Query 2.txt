@@ -1,0 +1,22 @@
+-- Aren's Query 2 - (Query of my choice)
+-- This query organizes the top end cpu's with and without igpu's for consumers to decide if iGPU's offer better performance overall.
+-- It displays each generations top cpu's clock speeds with and without iGPU's within the range of clock speed 4.0 to max
+SELECT 
+    gen.gen_codename AS Generation, -- Selecting the generation code name
+    s.socket_id AS Socket_Type, -- Selecting the socket type
+    CONCAT('i', se.series_id, '-', c.cpu_name) AS CPU, -- Generating a representation of the CPU
+    MAX(CASE WHEN c.igpu_id = 0 THEN CONCAT(c.cpu_boost_clock, ' GHz') END) AS CPU_Without_iGpu, -- Selecting max CPU boost clock without iGPU
+    MAX(CASE WHEN c.igpu_id != 0 THEN CONCAT(c.cpu_boost_clock, ' GHz') END) AS CPU_With_iGpu -- Selecting max CPU boost clock with iGPU
+FROM 
+    cpu c
+INNER JOIN series se ON c.series_id = se.series_id -- Joining CPU with Series based on series_id
+INNER JOIN socket s ON c.socket_id = s.socket_id -- Joining CPU with Socket based on socket_id
+LEFT JOIN generation gen ON c.gen_id = gen.gen_id -- Joining CPU with Generation based on gen_id
+WHERE
+    c.cpu_boost_clock >= 4.0 -- Filter the CPU boost clock greater than or equal to 4.0 GHz
+GROUP BY 
+    gen.gen_codename, s.socket_id, CONCAT('i', se.series_id, '-', c.cpu_name) -- Grouping the results by generation, socket type, and CPU representation
+ORDER BY 
+    gen.gen_codename DESC, -- Ordering by Generation in descending order
+    MAX(CASE WHEN c.igpu_id != 0 THEN c.cpu_boost_clock ELSE 0 END) DESC, -- Ordering by max CPU boost clock with iGPU in descending order
+    MAX(CASE WHEN c.igpu_id = 0 THEN c.cpu_boost_clock ELSE 0 END) DESC; -- Ordering by max CPU boost clock without iGPU in descending order

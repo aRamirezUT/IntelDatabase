@@ -1,0 +1,203 @@
+-- Create a new schema called intelCPU_DB and then select it for use 
+CREATE DATABASE IF NOT EXISTS intelCPU_DB;
+USE intelCPU_DB;
+
+-- If for some reason the tables already exist, drop them so they can be recreated fresh 
+DROP TABLE IF EXISTS CPU;
+DROP TABLE IF EXISTS IGPU;
+DROP TABLE IF EXISTS SOCKET;
+DROP TABLE IF EXISTS SERIES;
+DROP TABLE IF EXISTS GENERATION;
+
+-- Create Generation table
+CREATE TABLE GENERATION (
+    gen_id INT PRIMARY KEY,
+    gen_codename VARCHAR(255),
+    gen_process VARCHAR(255)
+);
+
+INSERT INTO GENERATION (gen_id, gen_codename, gen_process) VALUES ('13', 'raptorlake', '10');
+INSERT INTO GENERATION (gen_id, gen_codename, gen_process) VALUES ('12', 'alderlake', '10');
+INSERT INTO GENERATION (gen_id, gen_codename, gen_process) VALUES ('11', 'rocketlake', '14');
+INSERT INTO GENERATION (gen_id, gen_codename, gen_process) VALUES ('10', 'cometlake', '14');
+INSERT INTO GENERATION (gen_id, gen_codename, gen_process) VALUES ('9', 'coffeelakerefresh', '14');
+INSERT INTO GENERATION (gen_id, gen_codename, gen_process) VALUES ('8', 'coffeelake', '14');
+INSERT INTO GENERATION (gen_id, gen_codename, gen_process) VALUES ('7', 'kabylake', '14');
+INSERT INTO GENERATION (gen_id, gen_codename, gen_process) VALUES ('6', 'skylake', '14');
+INSERT INTO GENERATION (gen_id, gen_codename, gen_process) VALUES ('0', 'none', '0');
+
+-- Create Series table
+CREATE TABLE SERIES (
+    series_id INT PRIMARY KEY
+);
+
+INSERT INTO SERIES (series_id) VALUES ('9');
+INSERT INTO SERIES (series_id) VALUES ('7');
+INSERT INTO SERIES (series_id) VALUES ('5');
+INSERT INTO SERIES (series_id) VALUES ('3');
+
+-- Create Socket table
+CREATE TABLE SOCKET (
+    socket_id INT PRIMARY KEY
+);
+
+INSERT INTO SOCKET (socket_id) VALUES ('1700');
+INSERT INTO SOCKET (socket_id) VALUES ('1200');
+INSERT INTO SOCKET (socket_id) VALUES ('1151');
+
+-- Create iGPU table
+CREATE TABLE IGPU (
+    igpu_id INT PRIMARY KEY,
+	igpu_name INT,
+    gen_id INT,
+    igpu_class VARCHAR(255),
+    igpu_boost_clock FLOAT,
+    FOREIGN KEY (gen_id) REFERENCES Generation(gen_id)
+);
+
+INSERT INTO IGPU (igpu_id, igpu_name, gen_id, igpu_class, igpu_boost_clock) VALUES ('1', '770', '13', 'uhd', '1.65');
+INSERT INTO IGPU (igpu_id, igpu_name, gen_id, igpu_class, igpu_boost_clock) VALUES ('2', '730', '13', 'uhd', '1.55');
+INSERT INTO IGPU (igpu_id, igpu_name, gen_id, igpu_class, igpu_boost_clock) VALUES ('3', '770', '12', 'uhd', '1.55');
+INSERT INTO IGPU (igpu_id, igpu_name, gen_id, igpu_class, igpu_boost_clock) VALUES ('4', '730', '12', 'uhd', '1.45');
+INSERT INTO IGPU (igpu_id, igpu_name, gen_id, igpu_class, igpu_boost_clock) VALUES ('5', '750', '11', 'uhd', '1.30');
+INSERT INTO IGPU (igpu_id, igpu_name, gen_id, igpu_class, igpu_boost_clock) VALUES ('6', '730', '11', 'uhd', '1.30');
+INSERT INTO IGPU (igpu_id, igpu_name, gen_id, igpu_class, igpu_boost_clock) VALUES ('7', '630', '10', 'uhd', '1.20');
+INSERT INTO IGPU (igpu_id, igpu_name, gen_id, igpu_class, igpu_boost_clock) VALUES ('8', '630', '9', 'uhd', '1.20');
+INSERT INTO IGPU (igpu_id, igpu_name, gen_id, igpu_class, igpu_boost_clock) VALUES ('9', '630', '8', 'uhd', '1.20');
+INSERT INTO IGPU (igpu_id, igpu_name, gen_id, igpu_class, igpu_boost_clock) VALUES ('10', '630', '7', 'hd', '1.15');
+INSERT INTO IGPU (igpu_id, igpu_name, gen_id, igpu_class, igpu_boost_clock) VALUES ('11', '530', '6', 'hd', '1.15');
+INSERT INTO IGPU (igpu_id, igpu_name, gen_id, igpu_class, igpu_boost_clock) VALUES ('0', '0', '0', 'none', '0.00');
+
+-- Create CPU table
+CREATE TABLE CPU (
+    cpu_id INT PRIMARY KEY,
+    cpu_name VARCHAR(7),
+    gen_id INT,
+    series_id INT,
+    socket_id INT,
+    cpu_date INT,
+    cpu_base_clock FLOAT,
+    cpu_boost_clock FLOAT,
+    cpu_core_count INT,
+    cpu_thread_count INT,
+    cpu_cache INT,
+    cpu_tdp INT,
+    igpu_id INT,
+    FOREIGN KEY (gen_id) REFERENCES Generation(gen_id),
+    FOREIGN KEY (series_id) REFERENCES Series(series_id),
+    FOREIGN KEY (socket_id) REFERENCES Socket(socket_id),
+    FOREIGN KEY (igpu_id) REFERENCES iGPU(igpu_id)
+);
+
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('1', '13', '9', '1700', '13900k', '2022', '3.00', '5.70', '24', '32', '36', '125', '1');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('2', '13', '9', '1700', '13900kf', '2022', '3.00', '5.70', '24', '32', '36', '125', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('3', '13', '9', '1700', '13900', '2023', '2.00', '5.50', '24', '32', '36', '65', '1');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('4', '13', '9', '1700', '13900f', '2023', '2.00', '5.50', '24', '32', '36', '65', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('5', '13', '7', '1700', '13700k', '2022', '3.40', '5.40', '16', '24', '30', '125', '1');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('6', '13', '7', '1700', '13700kf', '2022', '3.40', '5.40', '16', '24', '30', '125', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('7', '13', '7', '1700', '13700', '2023', '2.10', '5.20', '16', '24', '30', '65', '1');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('8', '13', '7', '1700', '13700f', '2023', '2.10', '5.20', '16', '24', '30', '65', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('9', '13', '5', '1700', '13600k', '2022', '3.50', '5.10', '14', '20', '24', '125', '1');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('10', '13', '5', '1700', '13600kf', '2022', '3.50', '5.10', '14', '20', '24', '125', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('11', '13', '5', '1700', '13600', '2023', '2.70', '5.00', '14', '20', '24', '65', '1');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('12', '13', '5', '1700', '13500', '2023', '2.50', '4.80', '14', '20', '24', '65', '1');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('13', '13', '5', '1700', '13400', '2023', '2.50', '4.60', '10', '16', '20', '65', '2');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('14', '13', '5', '1700', '13400f', '2023', '2.50', '4.60', '10', '16', '20', '65', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('15', '13', '3', '1700', '13100', '2023', '3.40', '4.50', '4', '8', '12', '60', '2');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('16', '13', '3', '1700', '13100f', '2023', '3.40', '4.50', '4', '8', '12', '58', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('17', '12', '9', '1700', '12900k', '2021', '3.20', '5.20', '16', '24', '30', '125', '3');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('18', '12', '9', '1700', '12900kf', '2021', '3.20', '5.20', '16', '24', '30', '125', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('19', '12', '9', '1700', '12900', '2022', '2.40', '5.10', '16', '24', '30', '65', '3');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('20', '12', '9', '1700', '12900f', '2022', '2.40', '5.10', '16', '24', '30', '65', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('21', '12', '7', '1700', '12700k', '2021', '3.60', '5.00', '12', '20', '25', '125', '3');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('22', '12', '7', '1700', '12700kf', '2021', '3.60', '5.00', '12', '20', '25', '125', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('23', '12', '7', '1700', '12700', '2022', '2.10', '4.90', '12', '20', '25', '65', '3');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('24', '12', '7', '1700', '12700f', '2022', '2.10', '4.90', '12', '20', '25', '65', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('25', '12', '5', '1700', '12600k', '2021', '3.70', '4.90', '10', '16', '20', '125', '3');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('26', '12', '5', '1700', '12600kf', '2021', '3.70', '4.90', '10', '16', '20', '125', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('27', '12', '5', '1700', '12600', '2022', '3.30', '4.80', '6', '12', '18', '65', '3');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('28', '12', '5', '1700', '12500', '2022', '3.00', '4.60', '6', '12', '18', '65', '3');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('29', '12', '5', '1700', '12400', '2022', '2.50', '4.40', '6', '12', '18', '65', '4');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('30', '12', '5', '1700', '12400f', '2022', '2.50', '4.40', '6', '12', '18', '65', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('31', '12', '3', '1700', '12300', '2022', '3.50', '4.40', '4', '8', '12', '60', '4');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('32', '12', '3', '1700', '12100', '2022', '3.30', '4.30', '4', '8', '12', '60', '4');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('33', '12', '3', '1700', '12100f', '2022', '3.30', '4.30', '4', '8', '12', '60', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('34', '11', '9', '1200', '11900k', '2021', '3.50', '5.20', '8', '16', '16', '125', '5');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('35', '11', '9', '1200', '11900kf', '2021', '3.50', '5.20', '8', '16', '16', '125', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('36', '11', '9', '1200', '11900', '2021', '2.50', '5.10', '8', '16', '16', '65', '5');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('37', '11', '9', '1200', '11900f', '2021', '2.50', '5.10', '8', '16', '16', '65', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('38', '11', '7', '1200', '11700k', '2021', '3.60', '5.00', '8', '16', '16', '125', '5');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('39', '11', '7', '1200', '11700kf', '2021', '3.60', '5.00', '8', '16', '16', '125', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('40', '11', '7', '1200', '11700', '2021', '2.50', '4.90', '8', '16', '16', '65', '5');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('41', '11', '7', '1200', '11700f', '2021', '2.50', '4.90', '8', '16', '16', '65', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('42', '11', '5', '1200', '11600k', '2021', '3.90', '4.90', '6', '12', '12', '125', '5');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('43', '11', '5', '1200', '11600kf', '2021', '3.90', '4.90', '6', '12', '12', '125', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('44', '11', '5', '1200', '11600', '2021', '2.80', '4.80', '6', '12', '12', '65', '5');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('45', '11', '5', '1200', '11500', '2021', '2.70', '4.60', '6', '12', '12', '65', '5');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('46', '11', '5', '1200', '11400', '2021', '2.60', '4.40', '6', '12', '12', '65', '6');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('47', '11', '5', '1200', '11400f', '2021', '2.60', '4.40', '6', '12', '12', '65', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('48', '10', '9', '1200', '10910', '2020', '3.60', '5.00', '10', '20', '20', '125', '7');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('49', '10', '9', '1200', '10900k', '2020', '3.70', '5.30', '10', '20', '20', '125', '7');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('50', '10', '9', '1200', '10900kf', '2020', '3.70', '5.30', '10', '20', '20', '125', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('51', '10', '9', '1200', '10900', '2020', '2.80', '5.20', '10', '20', '20', '65', '7');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('52', '10', '9', '1200', '10900f', '2020', '2.80', '5.20', '10', '20', '20', '65', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('53', '10', '9', '1200', '10850k', '2020', '3.60', '5.20', '10', '20', '20', '125', '7');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('54', '10', '7', '1200', '10700k', '2020', '3.80', '5.10', '8', '16', '16', '125', '7');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('55', '10', '7', '1200', '10700kf', '2020', '3.80', '5.10', '8', '16', '16', '125', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('56', '10', '7', '1200', '10700', '2020', '2.90', '4.80', '8', '16', '16', '65', '7');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('57', '10', '7', '1200', '10700f', '2020', '2.90', '4.80', '8', '16', '16', '65', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('58', '10', '5', '1200', '10600k', '2020', '4.10', '4.80', '6', '12', '12', '125', '7');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('59', '10', '5', '1200', '10600kf', '2020', '4.10', '4.80', '6', '12', '12', '125', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('60', '10', '5', '1200', '10600', '2020', '3.30', '4.80', '6', '12', '12', '65', '7');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('61', '10', '5', '1200', '10505', '2021', '3.20', '4.60', '6', '12', '12', '65', '7');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('62', '10', '5', '1200', '10500', '2020', '3.10', '4.50', '6', '12', '12', '65', '7');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('63', '10', '5', '1200', '10400', '2020', '2.90', '4.30', '6', '12', '12', '65', '7');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('64', '10', '5', '1200', '10400f', '2020', '2.90', '4.30', '6', '12', '12', '65', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('65', '10', '3', '1200', '10320', '2020', '3.80', '4.60', '4', '8', '8', '65', '7');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('66', '10', '3', '1200', '10300', '2020', '3.70', '4.40', '4', '8', '8', '65', '7');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('67', '10', '3', '1200', '10100', '2020', '3.60', '4.30', '4', '8', '6', '65', '7');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('68', '10', '3', '1200', '10100f', '2020', '3.60', '4.30', '4', '8', '6', '65', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('69', '9', '9', '1151', '9900k', '2018', '3.60', '5.00', '8', '16', '16', '95', '8');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('70', '9', '9', '1151', '9900', '2019', '3.10', '5.00', '8', '16', '16', '65', '8');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('71', '9', '7', '1151', '9700k', '2018', '3.60', '4.90', '8', '8', '12', '95', '8');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('72', '9', '7', '1151', '9700', '2019', '3.00', '4.70', '8', '8', '12', '65', '8');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('73', '9', '5', '1151', '9600k', '2019', '3.70', '4.60', '6', '6', '9', '95', '8');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('74', '9', '5', '1151', '9600kf', '2019', '3.70', '4.60', '6', '6', '9', '95', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('75', '9', '5', '1151', '9600', '2019', '3.10', '4.60', '6', '6', '9', '65', '8');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('76', '9', '5', '1151', '9500', '2019', '3.00', '4.40', '6', '6', '9', '65', '8');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('77', '9', '5', '1151', '9500f', '2019', '3.00', '4.40', '6', '6', '9', '65', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('78', '9', '5', '1151', '9400', '2019', '2.90', '4.10', '6', '6', '9', '65', '8');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('79', '9', '5', '1151', '9400f', '2019', '2.90', '4.10', '6', '6', '9', '65', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('80', '9', '3', '1151', '9350k', '2019', '4.00', '4.60', '4', '4', '8', '91', '8');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('81', '9', '3', '1151', '9350kf', '2019', '4.00', '4.60', '4', '4', '8', '9', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('82', '9', '3', '1151', '9320', '2019', '3.70', '4.40', '4', '4', '8', '65', '8');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('83', '9', '3', '1151', '9300', '2019', '3.70', '4.30', '4', '4', '8', '65', '8');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('84', '9', '3', '1151', '9100', '2019', '3.60', '4.20', '4', '4', '6', '65', '8');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('85', '9', '3', '1151', '9100f', '2019', '3.60', '4.20', '4', '4', '6', '65', '0');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('86', '8', '7', '1151', '8700k', '2017', '3.70', '4.70', '6', '12', '12', '95', '9');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('87', '8', '7', '1151', '8700', '2017', '3.20', '4.60', '6', '12', '12', '65', '9');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('88', '8', '7', '1151', '8086k', '2018', '4.00', '5.00', '6', '12', '12', '95', '9');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('89', '8', '5', '1151', '8600k', '2017', '3.60', '4.30', '6', '6', '9', '95', '9');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('90', '8', '5', '1151', '8500', '2018', '3.00', '4.10', '6', '6', '9', '65', '9');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('91', '8', '5', '1151', '8400', '2017', '2.80', '4.00', '6', '6', '9', '65', '9');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('92', '8', '3', '1151', '8350k', '2017', '4.00', '0', '4', '4', '8', '91', '9');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('93', '8', '3', '1151', '8100', '2017', '3.60', '0', '4', '4', '6', '65', '9');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('94', '7', '7', '1151', '7700k', '2017', '4.20', '4.50', '4', '8', '8', '91', '10');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('95', '7', '7', '1151', '7700', '2017', '3.60', '4.20', '4', '8', '8', '65', '10');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('96', '7', '5', '1151', '7600k', '2017', '3.80', '4.20', '4', '4', '6', '91', '10');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('97', '7', '5', '1151', '7600', '2017', '3.50', '4.10', '4', '4', '6', '65', '10');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('98', '7', '5', '1151', '7500', '2017', '3.40', '3.80', '4', '4', '6', '65', '10');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('99', '7', '5', '1151', '7400', '2017', '3.00', '3.50', '4', '4', '6', '65', '10');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('100', '7', '3', '1151', '7350k', '2017', '4.20', '0', '2', '4', '4', '60', '10');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('101', '7', '3', '1151', '7320', '2017', '4.10', '0', '2', '4', '4', '51', '10');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('102', '7', '3', '1151', '7300', '2017', '4.00', '0', '2', '4', '4', '51', '10');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('103', '7', '3', '1151', '7100', '2017', '3.90', '0', '2', '4', '3', '51', '10');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('104', '6', '7', '1151', '6700k', '2015', '4.00', '4.20', '4', '8', '8', '91', '11');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('105', '6', '7', '1151', '6700', '2015', '3.40', '4.00', '4', '8', '8', '65', '11');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('106', '6', '5', '1151', '6600k', '2015', '3.50', '3.90', '4', '4', '6', '91', '11');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('107', '6', '5', '1151', '6600', '2015', '3.30', '3.90', '4', '4', '6', '65', '11');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('108', '6', '5', '1151', '6500', '2015', '3.20', '3.60', '4', '4', '6', '65', '11');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('109', '6', '5', '1151', '6400', '2015', '2.70', '3.30', '4', '4', '6', '65', '11');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('110', '6', '3', '1151', '6320', '2015', '3.90', '0', '2', '4', '4', '51', '11');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('111', '6', '3', '1151', '6300', '2015', '3.80', '0', '2', '4', '3', '51', '11');
+INSERT INTO CPU (cpu_id, gen_id, series_id, socket_id, cpu_name, cpu_date, cpu_base_clock, cpu_boost_clock, cpu_core_count, cpu_thread_count, cpu_cache, cpu_tdp, igpu_id) VALUES ('112', '6', '3', '1151', '6100', '2015', '3.70', '0', '2', '4', '3', '51', '11');
