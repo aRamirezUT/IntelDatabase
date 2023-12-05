@@ -54,3 +54,10 @@ Information should be based on previously published sources rather than personal
 interpretations or observations.
 10. Wikipedia relies on a community of dedicated editors who can monitor recent changes
 for vandalism or improper edits. Vandalism of content is not permitted.
+
+# Credits
+Cristian Lopez: DDL, DML, 2 Queries  
+Ted Lee: DDL & 2 Queries  
+Aren Ramirez: 'Scraper' & 2 Queries  
+Charles Swick: ERD & 4 Queries  
+Victor Martinez: Data Dictionary & 2 Queries  
